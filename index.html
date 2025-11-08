@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Cấu Hình iOS By 𝙃𝙏 𝙄𝙊𝙎ᯓDev</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Thêm thư viện JSZip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --card-color: rgba(255, 255, 255, 0.1);
+            --text-color: white;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --radius: 15px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background: url('https://i.postimg.cc/DyC944zj/IMG-0144.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            transition: background-image 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 2.2em;
+        }
+        
+        .description {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: white;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: border-color 0.3s;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+        
+        .preview-section {
+            display: none;
+        }
+        
+        .preview-content {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            font-size: 13px;
+            color: #00ff00;
+            line-height: 1.4;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .secondary-btn {
+            background-color: rgba(108, 117, 125, 0.8);
+        }
+        
+        .secondary-btn:hover {
+            background-color: rgba(90, 98, 104, 0.9);
+        }
+        
+        /* Tab container with horizontal scroll */
+        .tabs-container {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .tabs-scroll {
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 5px;
+        }
+        
+        .tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tabs {
+            display: inline-flex;
+            background: transparent;
+            border-radius: var(--radius);
+            padding: 5px;
+            gap: 5px;
+            min-width: 100%;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            min-width: 140px;
+            flex-shrink: 0;
+        }
+        
+        .tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Advanced tabs container */
+        .advanced-tabs-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .advanced-tabs-scroll {
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 5px;
+        }
+        
+        .advanced-tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .advanced-tabs {
+            display: inline-flex;
+            background: transparent;
+            border-radius: var(--radius);
+            padding: 5px;
+            gap: 5px;
+            min-width: 100%;
+        }
+        
+        .advanced-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            min-width: 160px;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+        
+        .advanced-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .advanced-tab-content {
+            display: none;
+        }
+        
+        .advanced-tab-content.active {
+            display: block;
+        }
+        
+        .success-message {
+            background: rgba(212, 237, 218, 0.9);
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #28a745;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .multiple-webclips-section {
+            background-color: rgba(255, 248, 225, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #FFA000;
+        }
+        
+        .webclip-list {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .webclip-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .webclip-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .webclip-item-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .webclip-item-info {
+            flex: 1;
+        }
+        
+        .webclip-item-name {
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .webclip-item-url {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .webclip-item-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .remove-btn {
+            background-color: #FF3B30;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .remove-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .file-input-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+        }
+
+        .settings-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: none;
+            font-size: 20px;
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+
+        .customization-panel {
+            position: fixed;
+            top: 50%;
+            left: -400px;
+            transform: translateY(-50%);
+            width: 350px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 25px;
+            border-radius: 0 15px 15px 0;
+            z-index: 1000;
+            transition: left 0.5s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        .customization-panel.open {
+            left: 0;
+        }
+
+        .toggle-panel {
+            position: absolute;
+            right: -45px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5), 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .theme-red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .theme-blue { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .theme-green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .theme-purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .input-group input[type="file"],
+        .input-group input[type="range"] {
+            width: 100%;
+        }
+
+        .value-display {
+            text-align: center;
+            margin-top: 8px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .background-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .bg-option {
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .bg-option:hover {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .bg-option.active {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Simple actions */
+        .simple-actions {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .install-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+        }
+
+        .install-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .create-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+        }
+
+        .create-btn:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        /* Flower effect */
+        .flower {
+            position: absolute;
+            font-size: 20px;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.7;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .tabs {
+                min-width: auto;
+            }
+            
+            .tab {
+                min-width: 120px;
+                padding: 10px 15px;
+            }
+            
+            .advanced-tabs {
+                min-width: auto;
+            }
+            
+            .advanced-tab {
+                min-width: 140px;
+                padding: 8px 12px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .customization-panel {
+                width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Tạo Cấu Hình iOS By 𝙃𝙏 𝙄𝙊𝙎ᯓDev</h1>
+            <p class="description">Công cụ tạo file cấu hình .mobileconfig cho thiết bị iOS một cách dễ dàng</p>
+        </header>
+        
+        <div class="tabs-container">
+            <div class="tabs-scroll">
+                <div class="tabs">
+                    <div class="tab active" data-tab="basic">Thông Tin Cơ Bản</div>
+                    <div class="tab" data-tab="wifi">Wi-Fi</div>
+                    <div class="tab" data-tab="dns">DNS</div>
+                    <div class="tab" data-tab="webclip">Web Clip</div>
+                    <div class="tab" data-tab="advanced">Nâng Cao</div>
+                </div>
+            </div>
+        </div>
+        
+        <form id="configForm">
+            <!-- Tab Thông Tin Cơ Bản -->
+            <div class="tab-content active" id="basic-tab">
+                <div class="card">
+                    <h2>Thông Tin Cấu Hình</h2>
+                    <div class="form-group">
+                        <label for="configName">Tên Cấu Hình</label>
+                        <input type="text" id="configName" placeholder="Ví dụ: Cấu hình công ty" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="configDescription">Mô Tả</label>
+                        <textarea id="configDescription" rows="3" placeholder="Mô tả về cấu hình này"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="organization">Tổ Chức</label>
+                        <input type="text" id="organization" placeholder="Tên công ty/tổ chức">
+                    </div>
+                    <div class="form-group">
+                        <label for="identifier">Định Danh</label>
+                        <input type="text" id="identifier" placeholder="com.company.configuration" required>
+                        <small style="color: rgba(255,255,255,0.7); font-size: 12px;">Định danh duy nhất cho cấu hình (thường là tên miền ngược)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="removalDisallowed">Không Cho Phép Gỡ Bỏ</label>
+                        <select id="removalDisallowed">
+                            <option value="false">Cho phép gỡ bỏ</option>
+                            <option value="true">Không cho phép gỡ bỏ</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Cấu Hình Wi-Fi -->
+            <div class="tab-content" id="wifi-tab">
+                <div class="card">
+                    <h2>Cấu Hình Wi-Fi</h2>
+                    <div class="form-group">
+                        <label for="wifiSSID">SSID (Tên Mạng)</label>
+                        <input type="text" id="wifiSSID" placeholder="Tên mạng Wi-Fi">
+                    </div>
+                    <div class="form-group">
+                        <label for="wifiSecurity">Bảo Mật</label>
+                        <select id="wifiSecurity">
+                            <option value="None">Không</option>
+                            <option value="WEP">WEP</option>
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WPA2">WPA2 Enterprise</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="wifiPassword">Mật Khẩu</label>
+                        <input type="password" id="wifiPassword" placeholder="Mật khẩu Wi-Fi">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="wifiAutoJoin">Tự Động Kết Nối</label>
+                            <select id="wifiAutoJoin">
+                                <option value="true">Có</option>
+                                <option value="false">Không</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="wifiHidden">Mạng Ẩn</label>
+                            <select id="wifiHidden">
+                                <option value="false">Không</option>
+                                <option value="true">Có</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Cấu Hình DNS -->
+            <div class="tab-content" id="dns-tab">
+                <div class="card">
+                    <h2>Cấu Hình DNS</h2>
+                    <div class="form-group">
+                        <label for="dnsProxy">Proxy DNS</label>
+                        <select id="dnsProxy">
+                            <option value="false">Không sử dụng</option>
+                            <option value="true">Sử dụng proxy DNS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dnsServers">Máy Chủ DNS</label>
+                        <textarea id="dnsServers" rows="3" placeholder="Nhập địa chỉ DNS, mỗi địa chỉ trên một dòng (ví dụ: 8.8.8.8, 1.1.1.1)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="dnsSearchDomains">Tên Miền Tìm Kiếm</label>
+                        <textarea id="dnsSearchDomains" rows="2" placeholder="Nhập tên miền tìm kiếm, mỗi tên miền trên một dòng"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Web Clip -->
+            <div class="tab-content" id="webclip-tab">
+                <div class="card">
+                    <h2>Web Clip</h2>
+                    
+                    <!-- PHẦN TẠO NHIỀU WEBCLIP -->
+                    <div class="multiple-webclips-section">
+                        <h3><i class="fas fa-layer-group"></i> Tạo Nhiều Web Clip</h3>
+                        <div class="form-group">
+                            <label for="multipleWebclipCount">Số lượng Web Clip cần tạo</label>
+                            <input type="number" id="multipleWebclipCount" min="1" max="8000" value="1" placeholder="Nhập số lượng">
+                        </div>
+                        <div class="form-group">
+                            <label for="multipleWebclipBaseName">Tên for Webclip</label>
+                            <input type="text" id="multipleWebclipBaseName" placeholder="Ví dụ: Ứng dụng">
+                        </div>
+                        <div class="form-group">
+                            <label for="multipleWebclipBaseURL">UỦL for Webclip</label>
+                            <input type="text" id="multipleWebclipBaseURL" placeholder="Ví dụ: https://app.com/app">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="webclipFullScreen">Chế độ toàn màn hình</label>
+                            <select id="webclipFullScreen">
+                                <option value="true">Có</option>
+                                <option value="false" selected>Không</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="webclipIconFile">Biểu Tượng Web Clip</label>
+                            <div class="file-input-wrapper">
+                                <div class="file-input-btn">
+                                    <i class="fas fa-image"></i> Chọn ảnh biểu tượng
+                                </div>
+                                <input type="file" id="webclipIconFile" accept="image/*">
+                            </div>
+                            <div class="file-name" id="webclipIconFileName">Chưa chọn ảnh</div>
+                        </div>
+                        <button type="button" class="auto-generate-btn" id="generateMultipleWebclipsBtn">Tạo Nhiều Web Clip</button>
+                    </div>
+
+                    <!-- DANH SÁCH WEBCLIP ĐÃ TẠO -->
+                    <div class="webclips-summary-section" style="background-color: rgba(232, 245, 233, 0.1); border-radius: 8px; padding: 20px; margin-top: 20px; border-left: 4px solid #4CAF50;">
+                        <h3><i class="fas fa-list"></i> Danh Sách Web Clip Đã Tạo</h3>
+                        <div style="color: rgba(255,255,255,0.8); margin-bottom: 15px; font-size: 14px;">
+                            Tổng số: <span id="totalWebclipsCount">0</span> web clip
+                        </div>
+                        <div class="webclip-list" id="multipleWebclipsList" style="max-height: 400px;">
+                            <!-- Empty State -->
+                            <div class="empty-state" id="webclipEmptyState" style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.6);">
+                                <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                                <p style="margin: 0 0 8px 0; font-size: 1.1em;">Chưa có web clip nào được tạo</p>
+                                <small style="font-size: 0.9em;">Hãy thêm web clip từ phần bên trên</small>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button type="button" id="clearAllWebclipsBtn" class="remove-btn" style="background-color: #f44336;">
+                                <i class="fas fa-trash"></i> Xóa Tất Cả
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Nâng Cao -->
+            <div class="tab-content" id="advanced-tab">
+                <div class="advanced-tabs-container">
+                    <div class="advanced-tabs-scroll">
+                        <div class="advanced-tabs">
+                            <div class="advanced-tab active" data-advanced-tab="network">Cấu Hình Mạng</div>
+                            <div class="advanced-tab" data-advanced-tab="storage">Thiết Lập Dung Lượng</div>
+                            <div class="advanced-tab" data-advanced-tab="notification">Thiết Lập Thông Báo</div>
+                            <div class="advanced-tab" data-advanced-tab="custom">Dữ Liệu Tùy Chỉnh</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="advanced-tab-content active" id="network-tab">
+                    <div class="card">
+                        <h2>Cấu Hình Mạng</h2>
+                        <div class="form-group">
+                            <label for="apnName">Tên APN</label>
+                            <input type="text" id="apnName" placeholder="Tên điểm truy cập">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="apnUsername">Tên Đăng Nhập APN</label>
+                                <input type="text" id="apnUsername" placeholder="Tên đăng nhập APN">
+                            </div>
+                            <div class="form-group">
+                                <label for="apnPassword">Mật Khẩu APN</label>
+                                <input type="password" id="apnPassword" placeholder="Mật khẩu APN">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="apnProxy">Proxy</label>
+                                <input type="text" id="apnProxy" placeholder="proxy.example.com:8080">
+                            </div>
+                            <div class="form-group">
+                                <label for="apnProxyPort">Cổng Proxy</label>
+                                <input type="number" id="apnProxyPort" placeholder="8080">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="advanced-tab-content" id="storage-tab">
+                    <div class="card">
+                        <h2>Thiết Lập Dung Lượng</h2>
+                        <div class="form-group">
+                            <label for="fakeStorageEnabled">Kích Hoạt Dung Lượng Giả</label>
+                            <select id="fakeStorageEnabled">
+                                <option value="false">Không</option>
+                                <option value="true">Có</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fakeTotalCapacity">Tổng Dung Lượng (GB)</label>
+                                <input type="number" id="fakeTotalCapacity" placeholder="128" min="1" max="1024">
+                            </div>
+                            <div class="form-group">
+                                <label for="fakeAvailableCapacity">Dung Lượng Trống (GB)</label>
+                                <input type="number" id="fakeAvailableCapacity" placeholder="64" min="1" max="1024">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="advanced-tab-content" id="notification-tab">
+                    <div class="card">
+                        <h2>Thiết Lập Thông Báo</h2>
+                        <div class="form-group">
+                            <label for="notificationTitle">Tiêu Đề Thông Báo</label>
+                            <input type="text" id="notificationTitle" placeholder="Tiêu đề thông báo">
+                        </div>
+                        <div class="form-group">
+                            <label for="notificationBody">Nội Dung Thông Báo</label>
+                            <textarea id="notificationBody" rows="4" placeholder="Nội dung thông báo"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="notificationAction">Hành Động</label>
+                                <input type="text" id="notificationAction" placeholder="Hành động (tùy chọn)">
+                            </div>
+                            <div class="form-group">
+                                <label for="notificationSound">Âm Thanh</label>
+                                <select id="notificationSound">
+                                    <option value="">Mặc định</option>
+                                    <option value="chime">Chime</option>
+                                    <option value="alert">Alert</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="advanced-tab-content" id="custom-tab">
+                    <div class="card">
+                        <h2>Dữ Liệu Tùy Chỉnh</h2>
+                        <div class="form-group">
+                            <label for="customPayloadType">Loại Payload Tùy Chỉnh</label>
+                            <input type="text" id="customPayloadType" placeholder="com.company.custom">
+                        </div>
+                        <div class="form-group">
+                            <label for="customPayloadData">Dữ Liệu Tùy Chỉnh (XML/JSON)</label>
+                            <textarea id="customPayloadData" rows="6" placeholder='<key>CustomKey</key>
+<string>CustomValue</string>'></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="customPayloadDescription">Mô Tả Payload Tùy Chỉnh</label>
+                            <input type="text" id="customPayloadDescription" placeholder="Mô tả payload tùy chỉnh">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button type="button" id="previewBtn">Xem Trước</button>
+                <button type="button" id="generateBtn">Tạo Cấu Hình</button>
+            </div>
+        </form>
+        
+        <div class="preview-section card" id="previewSection">
+            <h2>Xem Trước Cấu Hình</h2>
+            <div class="preview-content" id="previewContent"></div>
+            
+            <div class="simple-actions">
+                <button type="button" id="installBtn" class="install-btn">
+                    <i class="fas fa-mobile-alt"></i> Cài Đặt Ngay
+                </button>
+                <button type="button" id="createBtn" class="create-btn">
+                    <i class="fas fa-file-download"></i> Tạo File ZIP
+                </button>
+            </div>
+            
+            <div class="actions">
+                <button type="button" id="closePreviewBtn" class="secondary-btn">Đóng</button>
+            </div>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            Cấu hình đã được tạo thành công! Chọn phương thức cài đặt phù hợp.
+        </div>
+    </div>
+
+    <!-- Settings Button -->
+    <button class="settings-btn" id="settingsBtn">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <!-- Customization Panel -->
+    <div class="customization-panel" id="customizationPanel">
+        <button class="toggle-panel" id="togglePanel">
+            <i class="fas fa-times"></i>
+        </button>
+        <h3>Tùy chỉnh giao diện</h3>
+        
+        <div class="input-group">
+            <label>Chọn ảnh nền:</label>
+            <div class="background-options">
+                <div class="bg-option active" data-bg="https://i.postimg.cc/DyC944zj/IMG-0144.jpg">Nền mặc định</div>
+                <div class="file-input-wrapper">
+                    <div class="file-input-btn">
+                        <i class="fas fa-upload"></i> Tải ảnh từ máy
+                    </div>
+                    <input type="file" id="customBgUpload" accept="image/*">
+                </div>
+                <div class="file-name" id="customBgFileName">Chưa chọn ảnh</div>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label>Chọn màu chủ đề:</label>
+            <div class="color-options">
+                <div class="color-option theme-blue active" data-theme="blue"></div>
+                <div class="color-option theme-red" data-theme="red"></div>
+                <div class="color-option theme-green" data-theme="green"></div>
+                <div class="color-option theme-purple" data-theme="purple"></div>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label>Âm lượng hiệu ứng:</label>
+            <input type="range" min="0" max="100" value="80" id="volumeSlider">
+            <div class="value-display"><span id="volumeValue">80</span>%</div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+// Biến lưu trữ web clips
+let webClips = [];
+let currentIconBase64 = null;
+
+// Audio elements
+const clickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
+const successSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-level-completed-2059.mp3');
+
+// State variables for customization
+let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+let volumeLevel = localStorage.getItem('volumeLevel') ? parseInt(localStorage.getItem('volumeLevel')) : 80;
+
+// Flower effect
+function createFlowerEffect() {
+    const flower = document.createElement('div');
+    flower.className = 'flower';
+    flower.innerHTML = '';
+    flower.style.left = Math.random() * 100 + 'vw';
+    flower.style.fontSize = (Math.random() * 20 + 15) + 'px';
+    flower.style.animationDuration = (Math.random() * 5 + 5) + 's';
+    document.body.appendChild(flower);
+    
+    // Remove flower after animation completes
+    setTimeout(() => {
+        flower.remove();
+    }, 10000);
+}
+
+// Helper functions
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function showToast(message, isSuccess = true) {
+    const toast = document.getElementById('toast');
+    if (toast) {
+        toast.textContent = message;
+        toast.style.background = isSuccess ? 'rgba(76, 175, 80, 0.9)' : 'rgba(244, 67, 54, 0.9)';
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 5000);
+    }
+}
+
+function updateWebclipsCount() {
+    const countElement = document.getElementById('totalWebclipsCount');
+    if (countElement) {
+        countElement.textContent = webClips.length;
+    }
+}
+
+function addWebclipToList(webclip) {
+    const list = document.getElementById('multipleWebclipsList');
+    if (!list) return;
+    
+    // Remove empty state if exists
+    const emptyState = document.getElementById('webclipEmptyState');
+    if (emptyState) {
+        emptyState.remove();
+    }
+    
+    const item = document.createElement('div');
+    item.className = 'webclip-item';
+    item.id = `webclip-${webclip.id}`;
+    
+    item.innerHTML = `
+        <div class="webclip-item-icon">
+            ${webclip.icon ? `<img src="${webclip.icon}" alt="${webclip.name}">` : `<div style="width:100%;height:100%;background:#007AFF;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold">${webclip.name.charAt(0)}</div>`}
+        </div>
+        <div class="webclip-item-info">
+            <div class="webclip-item-name">${webclip.name}</div>
+            <div class="webclip-item-url">${webclip.url}</div>
+            <div class="webclip-item-fullscreen" style="font-size: 12px; color: ${webclip.fullScreen ? '#4CAF50' : '#FF9800'}; margin-top: 5px;">
+                ${webclip.fullScreen ? '✓ Toàn màn hình' : '✗ Bình thường'}
+            </div>
+        </div>
+        <div class="webclip-item-actions">
+            <button class="remove-btn" onclick="removeWebclip('${webclip.id}')">Xóa</button>
+        </div>
+    `;
+    
+    list.appendChild(item);
+}
+
+function removeWebclip(id) {
+    webClips = webClips.filter(webclip => webclip.id !== id);
+    const element = document.getElementById(`webclip-${id}`);
+    if (element) {
+        element.remove();
+    }
+    
+    // Show empty state if no webclips
+    if (webClips.length === 0) {
+        const list = document.getElementById('multipleWebclipsList');
+        if (list) {
+            list.innerHTML = `
+                <div class="empty-state" id="webclipEmptyState" style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.6);">
+                    <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <p style="margin: 0 0 8px 0; font-size: 1.1em;">Chưa có web clip nào được tạo</p>
+                    <small style="font-size: 0.9em;">Hãy thêm web clip từ phần bên trên</small>
+                </div>
+            `;
+        }
+    }
+    
+    updateWebclipsCount();
+    saveFormData();
+    showToast('Đã xóa Web Clip', true);
+}
+
+function clearAllWebclips() {
+    if (webClips.length === 0) {
+        showToast('Không có webclip nào để xóa', false);
+        return;
+    }
+    
+    if (confirm(`Bạn có chắc muốn xóa tất cả ${webClips.length} web clip?`)) {
+        webClips = [];
+        const list = document.getElementById('multipleWebclipsList');
+        if (list) {
+            list.innerHTML = `
+                <div class="empty-state" id="webclipEmptyState" style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.6);">
+                    <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <p style="margin: 0 0 8px 0; font-size: 1.1em;">Chưa có web clip nào được tạo</p>
+                    <small style="font-size: 0.9em;">Hãy thêm web clip từ phần bên trên</small>
+                </div>
+            `;
+        }
+        updateWebclipsCount();
+        saveFormData();
+        showToast('Đã xóa tất cả web clip', true);
+    }
+}
+
+function handleIconFileSelect(event, fileNameElementId) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            currentIconBase64 = e.target.result;
+            const fileNameElement = document.getElementById(fileNameElementId);
+            if (fileNameElement) {
+                fileNameElement.textContent = file.name;
+            }
+            saveFormData();
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function generateMultipleWebclips() {
+    const countInput = document.getElementById('multipleWebclipCount');
+    const baseNameInput = document.getElementById('multipleWebclipBaseName');
+    const baseURLInput = document.getElementById('multipleWebclipBaseURL');
+    const fullScreenSelect = document.getElementById('webclipFullScreen');
+    
+    if (!countInput || !baseNameInput || !baseURLInput || !fullScreenSelect) {
+        showToast('Không tìm thấy các trường cần thiết', false);
+        return;
+    }
+    
+    const count = parseInt(countInput.value) || 1;
+    const baseName = baseNameInput.value || 'Ứng dụng';
+    const baseURL = baseURLInput.value || 'https://example.com/app';
+    const fullScreen = fullScreenSelect.value === 'true';
+    
+    if (count < 1 || count > 8000) {
+        showToast('Số lượng Web Clip phải từ 1 đến 8000', false);
+        return;
+    }
+    
+    // Clear old list
+    webClips = [];
+    const list = document.getElementById('multipleWebclipsList');
+    if (list) {
+        list.innerHTML = '';
+    }
+    
+    // Create new web clips
+    for (let i = 1; i <= count; i++) {
+        const webclip = {
+            id: generateUUID(),
+            name: baseName, // Sửa lỗi: Tên không thêm số thứ tự
+            url: baseURL, // Sửa lỗi: URL không thêm số thứ tự
+            icon: currentIconBase64,
+            fullScreen: fullScreen
+        };
+        
+        webClips.push(webclip);
+        addWebclipToList(webclip);
+    }
+    
+    updateWebclipsCount();
+    saveFormData();
+    showToast(`Đã tạo ${count} Web Clip thành công! ${fullScreen ? '(Toàn màn hình)' : ''}`, true);
+}
+
+// Make functions globally available
+window.removeWebclip = removeWebclip;
+window.generateUUID = generateUUID;
+
+// Start flower effect
+setInterval(createFlowerEffect, 500);
+
+// Play sound function
+function playSound(sound) {
+    if (!soundEnabled) return;
+    
+    sound.currentTime = 0;
+    sound.volume = volumeLevel / 100;
+    sound.play().catch(e => console.log("Audio play failed:", e));
+}
+
+// Update volume for all sounds
+function updateVolume() {
+    clickSound.volume = volumeLevel / 100;
+    successSound.volume = volumeLevel / 100;
+}
+
+// Customization functions
+function initCustomization() {
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumeValue = document.getElementById('volumeValue');
+    const colorOptions = document.querySelectorAll('.color-option');
+    
+    if (volumeSlider && volumeValue) {
+        // Set volume
+        volumeSlider.value = volumeLevel;
+        volumeValue.textContent = volumeLevel;
+        updateVolume();
+    }
+    
+    // Load saved theme if exists
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme && colorOptions.length > 0) {
+        document.documentElement.style.setProperty('--primary-color', savedTheme.split(',')[0]);
+        document.documentElement.style.setProperty('--secondary-color', savedTheme.split(',')[1]);
+        
+        colorOptions.forEach(option => {
+            option.classList.remove('active');
+        });
+        
+        const themeName = getThemeName(savedTheme);
+        const activeTheme = document.querySelector(`.theme-${themeName}`);
+        if (activeTheme) {
+            activeTheme.classList.add('active');
+        }
+    }
+
+    // Load custom background image if exists
+    const customBg = localStorage.getItem('customBackgroundImage');
+    if (customBg) {
+        document.body.style.backgroundImage = `url('${customBg}')`;
+        const fileNameElement = document.getElementById('customBgFileName');
+        if (fileNameElement) {
+            fileNameElement.textContent = 'Ảnh tùy chỉnh';
+        }
+        
+        // Deactivate all other background options
+        const bgOptions = document.querySelectorAll('.bg-option');
+        bgOptions.forEach(option => {
+            option.classList.remove('active');
+        });
+    }
+}
+
+function getThemeName(themeColors) {
+    const [primary, secondary] = themeColors.split(',');
+    if (primary === '#e74c3c' && secondary === '#c0392b') return 'red';
+    if (primary === '#3498db' && secondary === '#2980b9') return 'blue';
+    if (primary === '#2ecc71' && secondary === '#27ae60') return 'green';
+    if (primary === '#9b59b6' && secondary === '#8e44ad') return 'purple';
+    return 'blue';
+}
+
+// Save form data to localStorage
+function saveFormData() {
+    const formData = {
+        configName: document.getElementById('configName').value,
+        configDescription: document.getElementById('configDescription').value,
+        organization: document.getElementById('organization').value,
+        identifier: document.getElementById('identifier').value,
+        removalDisallowed: document.getElementById('removalDisallowed').value,
+        wifiSSID: document.getElementById('wifiSSID').value,
+        wifiSecurity: document.getElementById('wifiSecurity').value,
+        wifiPassword: document.getElementById('wifiPassword').value,
+        wifiAutoJoin: document.getElementById('wifiAutoJoin').value,
+        wifiHidden: document.getElementById('wifiHidden').value,
+        dnsProxy: document.getElementById('dnsProxy').value,
+        dnsServers: document.getElementById('dnsServers').value,
+        dnsSearchDomains: document.getElementById('dnsSearchDomains').value,
+        multipleWebclipCount: document.getElementById('multipleWebclipCount').value,
+        multipleWebclipBaseName: document.getElementById('multipleWebclipBaseName').value,
+        multipleWebclipBaseURL: document.getElementById('multipleWebclipBaseURL').value,
+        webclipFullScreen: document.getElementById('webclipFullScreen').value,
+        apnName: document.getElementById('apnName').value,
+        apnUsername: document.getElementById('apnUsername').value,
+        apnPassword: document.getElementById('apnPassword').value,
+        apnProxy: document.getElementById('apnProxy').value,
+        apnProxyPort: document.getElementById('apnProxyPort').value,
+        fakeStorageEnabled: document.getElementById('fakeStorageEnabled').value,
+        fakeTotalCapacity: document.getElementById('fakeTotalCapacity').value,
+        fakeAvailableCapacity: document.getElementById('fakeAvailableCapacity').value,
+        notificationTitle: document.getElementById('notificationTitle').value,
+        notificationBody: document.getElementById('notificationBody').value,
+        notificationAction: document.getElementById('notificationAction').value,
+        notificationSound: document.getElementById('notificationSound').value,
+        customPayloadType: document.getElementById('customPayloadType').value,
+        customPayloadData: document.getElementById('customPayloadData').value,
+        customPayloadDescription: document.getElementById('customPayloadDescription').value,
+        webClips: webClips,
+        currentIconBase64: currentIconBase64
+    };
+    
+    localStorage.setItem('configFormData', JSON.stringify(formData));
+}
+
+// Load form data from localStorage
+function loadFormData() {
+    const savedData = localStorage.getItem('configFormData');
+    if (savedData) {
+        const formData = JSON.parse(savedData);
+        
+        // Fill form fields
+        document.getElementById('configName').value = formData.configName || '';
+        document.getElementById('configDescription').value = formData.configDescription || '';
+        document.getElementById('organization').value = formData.organization || '';
+        document.getElementById('identifier').value = formData.identifier || '';
+        document.getElementById('removalDisallowed').value = formData.removalDisallowed || 'false';
+        document.getElementById('wifiSSID').value = formData.wifiSSID || '';
+        document.getElementById('wifiSecurity').value = formData.wifiSecurity || 'None';
+        document.getElementById('wifiPassword').value = formData.wifiPassword || '';
+        document.getElementById('wifiAutoJoin').value = formData.wifiAutoJoin || 'true';
+        document.getElementById('wifiHidden').value = formData.wifiHidden || 'false';
+        document.getElementById('dnsProxy').value = formData.dnsProxy || 'false';
+        document.getElementById('dnsServers').value = formData.dnsServers || '';
+        document.getElementById('dnsSearchDomains').value = formData.dnsSearchDomains || '';
+        document.getElementById('multipleWebclipCount').value = formData.multipleWebclipCount || '1';
+        document.getElementById('multipleWebclipBaseName').value = formData.multipleWebclipBaseName || '';
+        document.getElementById('multipleWebclipBaseURL').value = formData.multipleWebclipBaseURL || '';
+        document.getElementById('webclipFullScreen').value = formData.webclipFullScreen || 'false';
+        document.getElementById('apnName').value = formData.apnName || '';
+        document.getElementById('apnUsername').value = formData.apnUsername || '';
+        document.getElementById('apnPassword').value = formData.apnPassword || '';
+        document.getElementById('apnProxy').value = formData.apnProxy || '';
+        document.getElementById('apnProxyPort').value = formData.apnProxyPort || '';
+        document.getElementById('fakeStorageEnabled').value = formData.fakeStorageEnabled || 'false';
+        document.getElementById('fakeTotalCapacity').value = formData.fakeTotalCapacity || '';
+        document.getElementById('fakeAvailableCapacity').value = formData.fakeAvailableCapacity || '';
+        document.getElementById('notificationTitle').value = formData.notificationTitle || '';
+        document.getElementById('notificationBody').value = formData.notificationBody || '';
+        document.getElementById('notificationAction').value = formData.notificationAction || '';
+        document.getElementById('notificationSound').value = formData.notificationSound || '';
+        document.getElementById('customPayloadType').value = formData.customPayloadType || '';
+        document.getElementById('customPayloadData').value = formData.customPayloadData || '';
+        document.getElementById('customPayloadDescription').value = formData.customPayloadDescription || '';
+        
+        // Restore web clips
+        if (formData.webClips && formData.webClips.length > 0) {
+            webClips = formData.webClips;
+            const list = document.getElementById('multipleWebclipsList');
+            if (list) {
+                list.innerHTML = '';
+                webClips.forEach(webclip => {
+                    addWebclipToList(webclip);
+                });
+            }
+            updateWebclipsCount();
+        }
+        
+        // Restore icon
+        if (formData.currentIconBase64) {
+            currentIconBase64 = formData.currentIconBase64;
+            document.getElementById('webclipIconFileName').textContent = 'Đã chọn ảnh';
+        }
+        
+        showToast('Đã khôi phục dữ liệu từ phiên làm việc trước', true);
+    }
+}
+
+// Configuration generation functions
+function generateConfig(isPreview) {
+    // Get form values
+    const configName = document.getElementById('configName').value;
+    const configDescription = document.getElementById('configDescription').value;
+    const organization = document.getElementById('organization').value;
+    const identifier = document.getElementById('identifier').value;
+    const removalDisallowed = document.getElementById('removalDisallowed').value;
+    
+    // Validate required fields
+    if (!configName || !identifier) {
+        showToast('Vui lòng điền đầy đủ thông tin cơ bản (Tên cấu hình và Định danh)', false);
+        return;
+    }
+    
+    // Create mobileconfig XML
+    let mobileconfig = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>`;
+    
+    // Add Wi-Fi configuration if provided
+    const wifiSSID = document.getElementById('wifiSSID').value;
+    if (wifiSSID) {
+        const wifiSecurity = document.getElementById('wifiSecurity').value;
+        const wifiPassword = document.getElementById('wifiPassword').value;
+        const wifiAutoJoin = document.getElementById('wifiAutoJoin').value;
+        const wifiHidden = document.getElementById('wifiHidden').value;
+        
+        mobileconfig += `
+        <dict>
+            <key>PayloadType</key>
+            <string>com.apple.wifi.managed</string>
+            <key>PayloadUUID</key>
+            <string>${generateUUID()}</string>
+            <key>PayloadIdentifier</key>
+            <string>${identifier}.wifi</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadDisplayName</key>
+            <string>Wi-Fi (${wifiSSID})</string>
+            <key>PayloadDescription</key>
+            <string>Cấu hình Wi-Fi</string>
+            <key>HIDDEN_NETWORK</key>
+            <${wifiHidden}/>
+            <key>AutoJoin</key>
+            <${wifiAutoJoin}/>
+            <key>EncryptionType</key>
+            <string>${wifiSecurity}</string>
+            <key>SSID_STR</key>
+            <string>${wifiSSID}</string>`;
+    
+        if (wifiPassword && wifiSecurity !== 'None') {
+            mobileconfig += `
+            <key>Password</key>
+            <string>${wifiPassword}</string>`;
+        }
+        
+        mobileconfig += `
+        </dict>`;
+    }
+    
+    // Add DNS configuration if provided
+    const dnsProxy = document.getElementById('dnsProxy').value;
+    const dnsServers = document.getElementById('dnsServers').value;
+    if (dnsServers) {
+        const dnsServerList = dnsServers.split('\n').filter(s => s.trim() !== '');
+        const dnsSearchDomains = document.getElementById('dnsSearchDomains').value;
+        const dnsSearchDomainList = dnsSearchDomains.split('\n').filter(s => s.trim() !== '');
+        
+        mobileconfig += `
+        <dict>
+            <key>PayloadType</key>
+            <string>com.apple.dnsProxy.managed</string>
+            <key>PayloadUUID</key>
+            <string>${generateUUID()}</string>
+            <key>PayloadIdentifier</key>
+            <string>${identifier}.dns</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadDisplayName</key>
+            <string>Cấu hình DNS</string>
+            <key>PayloadDescription</key>
+            <string>Cấu hình máy chủ DNS</string>
+            <key>AppLayerVPN</key>
+            <${dnsProxy}/>`;
+    
+        if (dnsServerList.length > 0) {
+            mobileconfig += `
+            <key>ServerAddresses</key>
+            <array>`;
+            dnsServerList.forEach(server => {
+                mobileconfig += `
+                <string>${server.trim()}</string>`;
+            });
+            mobileconfig += `
+            </array>`;
+        }
+        
+        if (dnsSearchDomainList.length > 0) {
+            mobileconfig += `
+            <key>SearchDomains</key>
+            <array>`;
+            dnsSearchDomainList.forEach(domain => {
+                mobileconfig += `
+                <string>${domain.trim()}</string>`;
+            });
+            mobileconfig += `
+            </array>`;
+        }
+        
+        mobileconfig += `
+        </dict>`;
+    }
+    
+    // Add multiple Web Clips if any
+    webClips.forEach((webclip, index) => {
+        mobileconfig += `
+        <dict>
+            <key>PayloadType</key>
+            <string>com.apple.webClip.managed</string>
+            <key>PayloadUUID</key>
+            <string>${generateUUID()}</string>
+            <key>PayloadIdentifier</key>
+            <string>${identifier}.webclip${index + 1}</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadDisplayName</key>
+            <string>${webclip.name}</string>
+            <key>PayloadDescription</key>
+            <string>Web Clip</string>
+            <key>Label</key>
+            <string>${webclip.name}</string>
+            <key>URL</key>
+            <string>${webclip.url}</string>
+            <key>FullScreen</key>
+            <${webclip.fullScreen}/>
+            <key>Precomposed</key>
+            <true/>`;
+    
+        if (webclip.icon) {
+            const base64Data = webclip.icon.split(',')[1];
+            mobileconfig += `
+            <key>Icon</key>
+            <data>${base64Data}</data>`;
+        }
+        
+        mobileconfig += `
+        </dict>`;
+    });
+    
+    // Add APN configuration if provided
+    const apnName = document.getElementById('apnName').value;
+    if (apnName) {
+        const apnUsername = document.getElementById('apnUsername').value;
+        const apnPassword = document.getElementById('apnPassword').value;
+        const apnProxy = document.getElementById('apnProxy').value;
+        const apnProxyPort = document.getElementById('apnProxyPort').value;
+        
+        mobileconfig += `
+        <dict>
+            <key>PayloadType</key>
+            <string>com.apple.apn.managed</string>
+            <key>PayloadUUID</key>
+            <string>${generateUUID()}</string>
+            <key>PayloadIdentifier</key>
+            <string>${identifier}.apn</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadDisplayName</key>
+            <string>Cấu hình APN</string>
+            <key>PayloadDescription</key>
+            <string>Cấu hình mạng di động</string>
+            <key>apn</key>
+            <string>${apnName}</string>`;
+    
+        if (apnUsername) {
+            mobileconfig += `
+            <key>username</key>
+            <string>${apnUsername}</string>`;
+        }
+        
+        if (apnPassword) {
+            mobileconfig += `
+            <key>password</key>
+            <string>${apnPassword}</string>`;
+        }
+        
+        if (apnProxy) {
+            mobileconfig += `
+            <key>proxy</key>
+            <string>${apnProxy}</string>`;
+        }
+        
+        if (apnProxyPort) {
+            mobileconfig += `
+            <key>proxyPort</key>
+            <integer>${apnProxyPort}</integer>`;
+        }
+        
+        mobileconfig += `
+        </dict>`;
+    }
+    
+    // Add fake storage configuration if enabled
+    const fakeStorageEnabled = document.getElementById('fakeStorageEnabled').value;
+    if (fakeStorageEnabled === 'true') {
+        const fakeTotalCapacity = document.getElementById('fakeTotalCapacity').value;
+        const fakeAvailableCapacity = document.getElementById('fakeAvailableCapacity').value;
+        
+        if (fakeTotalCapacity && fakeAvailableCapacity) {
+            mobileconfig += `
+        <dict>
+            <key>PayloadType</key>
+            <string>com.apple.storagemanagement</string>
+            <key>PayloadUUID</key>
+            <string>${generateUUID()}</string>
+            <key>PayloadIdentifier</key>
+            <string>${identifier}.storage</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadDisplayName</key>
+            <string>Quản lý dung lượng</string>
+            <key>PayloadDescription</key>
+            <string>Cấu hình dung lượng thiết bị</string>
+            <key>TotalCapacity</key>
+            <integer>${parseInt(fakeTotalCapacity) * 1024 * 1024 * 1024}</integer>
+            <key>AvailableCapacity</key>
+            <integer>${parseInt(fakeAvailableCapacity) * 1024 * 1024 * 1024}</integer>
+        </dict>`;
+        }
+    }
+    
+    // Add notification configuration if provided
+    const notificationTitle = document.getElementById('notificationTitle').value;
+    const notificationBody = document.getElementById('notificationBody').value;
+    if (notificationTitle && notificationBody) {
+        const notificationAction = document.getElementById('notificationAction').value;
+        const notificationSound = document.getElementById('notificationSound').value;
+        
+        mobileconfig += `
+        <dict>
+            <key>PayloadType</key>
+            <string>com.apple.notificationsettings</string>
+            <key>PayloadUUID</key>
+            <string>${generateUUID()}</string>
+            <key>PayloadIdentifier</key>
+            <string>${identifier}.notification</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadDisplayName</key>
+            <string>Cấu hình thông báo</string>
+            <key>PayloadDescription</key>
+            <string>Thiết lập thông báo</string>
+            <key>AlertTitle</key>
+            <string>${notificationTitle}</string>
+            <key>AlertBody</key>
+            <string>${notificationBody}</string>`;
+    
+        if (notificationAction) {
+            mobileconfig += `
+            <key>AlertAction</key>
+            <string>${notificationAction}</string>`;
+        }
+        
+        if (notificationSound) {
+            mobileconfig += `
+            <key>SoundName</key>
+            <string>${notificationSound}</string>`;
+        }
+        
+        mobileconfig += `
+        </dict>`;
+    }
+    
+    // Add custom payload if provided
+    const customPayloadType = document.getElementById('customPayloadType').value;
+    const customPayloadData = document.getElementById('customPayloadData').value;
+    if (customPayloadType && customPayloadData) {
+        const customPayloadDescription = document.getElementById('customPayloadDescription').value;
+        
+        mobileconfig += `
+        <dict>
+            <key>PayloadType</key>
+            <string>${customPayloadType}</string>
+            <key>PayloadUUID</key>
+            <string>${generateUUID()}</string>
+            <key>PayloadIdentifier</key>
+            <string>${identifier}.custom</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadDisplayName</key>
+            <string>${customPayloadDescription || 'Payload tùy chỉnh'}</string>
+            <key>PayloadDescription</key>
+            <string>${customPayloadDescription || 'Payload tùy chỉnh'}</string>
+            ${customPayloadData}
+        </dict>`;
+    }
+    
+    mobileconfig += `
+    </array>
+    <key>PayloadDisplayName</key>
+    <string>${configName}</string>
+    <key>PayloadIdentifier</key>
+    <string>${identifier}</string>
+    <key>PayloadRemovalDisallowed</key>
+    <${removalDisallowed}/>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+            <string>${generateUUID()}</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>`;
+    
+    if (configDescription) {
+        mobileconfig += `
+    <key>PayloadDescription</key>
+    <string>${configDescription}</string>`;
+    }
+    
+    if (organization) {
+        mobileconfig += `
+    <key>PayloadOrganization</key>
+    <string>${organization}</string>`;
+    }
+    
+    mobileconfig += `
+</dict>
+</plist>`;
+    
+    if (isPreview) {
+        document.getElementById('previewContent').textContent = mobileconfig;
+        document.getElementById('previewSection').style.display = 'block';
+        document.getElementById('successMessage').style.display = 'none';
+    } else {
+        document.getElementById('previewContent').textContent = mobileconfig;
+        document.getElementById('previewSection').style.display = 'block';
+        document.getElementById('successMessage').style.display = 'block';
+    }
+}
+
+function handleDirectInstall() {
+    // Create a data URL for the mobileconfig content
+    const configContent = document.getElementById('previewContent').textContent;
+    const blob = new Blob([configContent], { type: 'application/x-apple-aspen-config' });
+    const url = URL.createObjectURL(blob);
+    
+    // Try to open the configuration directly
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'configuration.mobileconfig';
+    
+    // For iOS devices, we need to use a different approach
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+        // On iOS, we can try to open the file in a new tab
+        window.open(url, '_blank');
+        showToast('Trên iOS, vui lòng mở file trong tab mới và làm theo hướng dẫn', true);
+    } else {
+        // For other devices, trigger download and show instructions
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Đã tải file cấu hình. Mở file để cài đặt trên thiết bị iOS.', true);
+    }
+    
+    URL.revokeObjectURL(url);
+}
+
+// Hàm tạo file - chức năng chính từ nút "Tạo File"
+async function createFile() {
+    // Kiểm tra xem đã tạo cấu hình chưa
+    const previewContent = document.getElementById('previewContent').textContent;
+    if (!previewContent || previewContent.trim() === '') {
+        showToast('Vui lòng tạo cấu hình trước bằng nút "Tạo Cấu Hình"', false);
+        return;
+    }
+    
+    // Lấy tên cấu hình
+    const configName = document.getElementById('configName').value || 'configuration';
+    
+    // Lấy nội dung mobileconfig từ phần xem trước
+    const mobileconfigContent = previewContent;
+    
+    // Tạo file ZIP
+    const zip = new JSZip();
+    
+    // Thêm file mobileconfig vào ZIP
+    zip.file(`${configName}.mobileconfig`, mobileconfigContent);
+    
+    // Thêm file README.txt hướng dẫn
+    const readmeContent = `CẤU HÌNH iOS - HƯỚNG DẪN CÀI ĐẶT
+
+Tệp này chứa cấu hình cho thiết bị iOS của bạn.
+
+HƯỚNG DẪN CÀI ĐẶT:
+1. Giải nén tệp ZIP này
+2. Mở tệp ${configName}.mobileconfig trên thiết bị iOS
+3. Làm theo hướng dẫn trên màn hình để cài đặt cấu hình
+4. Vào Settings → General → VPN & Device Management để xác nhận cấu hình đã được cài đặt
+
+THÔNG TIN CẤU HÌNH:
+- Tên cấu hình: ${configName}
+- Tổ chức: ${document.getElementById('organization').value || 'Không có'}
+- Mô tả: ${document.getElementById('configDescription').value || 'Không có'}
+
+Tạo bởi: 𝙃𝙏 𝙄𝙊𝙎ᯓDev`;
+    
+    zip.file("README.txt", readmeContent);
+    
+    // Tạo và tải file ZIP
+    const zipBlob = await zip.generateAsync({type: "blob"});
+    const zipUrl = URL.createObjectURL(zipBlob);
+    
+    const a = document.createElement('a');
+    a.href = zipUrl;
+    a.download = `${configName}_iOS_Configuration.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(zipUrl);
+    
+    showToast('Đã tạo file ZIP chứa cấu hình thành công!', true);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Load saved form data
+    loadFormData();
+    
+    // Initialize webclips count
+    updateWebclipsCount();
+    
+    // Tab navigation
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to current tab and content
+            this.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+    });
+    
+    // Advanced tab navigation
+    const advancedTabs = document.querySelectorAll('.advanced-tab');
+    advancedTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-advanced-tab');
+            
+            // Remove active class from all advanced tabs and contents
+            document.querySelectorAll('.advanced-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.advanced-tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to current advanced tab and content
+            this.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+    });
+    
+    // Generate multiple webclips button
+    const generateMultipleBtn = document.getElementById('generateMultipleWebclipsBtn');
+    if (generateMultipleBtn) {
+        generateMultipleBtn.addEventListener('click', generateMultipleWebclips);
+    }
+    
+    // File input for webclip icon
+    const webclipIconFile = document.getElementById('webclipIconFile');
+    if (webclipIconFile) {
+        webclipIconFile.addEventListener('change', function(e) {
+            handleIconFileSelect(e, 'webclipIconFileName');
+        });
+    }
+    
+    // Preview button
+    const previewBtn = document.getElementById('previewBtn');
+    if (previewBtn) {
+        previewBtn.addEventListener('click', function() {
+            generateConfig(true);
+        });
+    }
+    
+    // Generate button
+    const generateBtn = document.getElementById('generateBtn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', function() {
+            generateConfig(false);
+        });
+    }
+    
+    // Close preview button
+    const closePreviewBtn = document.getElementById('closePreviewBtn');
+    if (closePreviewBtn) {
+        closePreviewBtn.addEventListener('click', function() {
+            const previewSection = document.getElementById('previewSection');
+            if (previewSection) {
+                previewSection.style.display = 'none';
+            }
+        });
+    }
+    
+    // Install button
+    const installBtn = document.getElementById('installBtn');
+    if (installBtn) {
+        installBtn.addEventListener('click', handleDirectInstall);
+    }
+    
+    // Create file button
+    const createBtn = document.getElementById('createBtn');
+    if (createBtn) {
+        createBtn.addEventListener('click', createFile);
+    }
+    
+    const clearAllWebclipsBtn = document.getElementById('clearAllWebclipsBtn');
+    if (clearAllWebclipsBtn) {
+        clearAllWebclipsBtn.addEventListener('click', clearAllWebclips);
+    }
+    
+    // Customization elements
+    const settingsBtn = document.getElementById('settingsBtn');
+    const customizationPanel = document.getElementById('customizationPanel');
+    const togglePanel = document.getElementById('togglePanel');
+    const bgOptions = document.querySelectorAll('.bg-option');
+    const colorOptions = document.querySelectorAll('.color-option');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumeValue = document.getElementById('volumeValue');
+    const customBgUpload = document.getElementById('customBgUpload');
+
+    // Initialize customization
+    initCustomization();
+    
+    // Event listeners for customization
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', function() {
+            playSound(clickSound);
+            customizationPanel.classList.toggle('open');
+        });
+    }
+    
+    if (togglePanel) {
+        togglePanel.addEventListener('click', function() {
+            playSound(clickSound);
+            customizationPanel.classList.toggle('open');
+        });
+    }
+    
+    // Background options
+    bgOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            playSound(clickSound);
+            
+            bgOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            
+            const bgUrl = this.getAttribute('data-bg');
+            document.body.style.backgroundImage = `url('${bgUrl}')`;
+            localStorage.setItem('backgroundImage', bgUrl);
+            localStorage.removeItem('customBackgroundImage');
+            document.getElementById('customBgFileName').textContent = 'Chưa chọn ảnh';
+            showToast('Đã thay đổi ảnh nền!', true);
+        });
+    });
+    
+    // Custom background upload
+    if (customBgUpload) {
+        customBgUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64 = e.target.result;
+                    document.body.style.backgroundImage = `url('${base64}')`;
+                    localStorage.setItem('customBackgroundImage', base64);
+                    localStorage.removeItem('backgroundImage');
+                    
+                    // Deactivate all other background options
+                    bgOptions.forEach(option => {
+                        option.classList.remove('active');
+                    });
+                    
+                    document.getElementById('customBgFileName').textContent = file.name;
+                    showToast('Đã đặt ảnh nền tùy chỉnh!', true);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Color theme change
+    colorOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            playSound(clickSound);
+            
+            colorOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            
+            const theme = this.getAttribute('data-theme');
+            let primaryColor, secondaryColor;
+            
+            switch(theme) {
+                case 'red':
+                    primaryColor = '#e74c3c';
+                    secondaryColor = '#c0392b';
+                    break;
+                case 'blue':
+                    primaryColor = '#3498db';
+                    secondaryColor = '#2980b9';
+                    break;
+                case 'green':
+                    primaryColor = '#2ecc71';
+                    secondaryColor = '#27ae60';
+                    break;
+                case 'purple':
+                    primaryColor = '#9b59b6';
+                    secondaryColor = '#8e44ad';
+                    break;
+            }
+            
+            document.documentElement.style.setProperty('--primary-color', primaryColor);
+            document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+            
+            localStorage.setItem('theme', `${primaryColor},${secondaryColor}`);
+            showToast(`Đã đổi sang chủ đề ${theme}!`, true);
+        });
+    });
+    
+    // Volume control
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', function() {
+            volumeLevel = this.value;
+            if (volumeValue) {
+                volumeValue.textContent = volumeLevel;
+            }
+            localStorage.setItem('volumeLevel', volumeLevel);
+            updateVolume();
+        });
+    }
+    
+    // Auto-save form data when inputs change
+    const formInputs = document.querySelectorAll('#configForm input, #configForm select, #configForm textarea');
+    formInputs.forEach(input => {
+        input.addEventListener('input', saveFormData);
+        input.addEventListener('change', saveFormData);
+    });
+});
+    </script>
+</body>
+</html>
